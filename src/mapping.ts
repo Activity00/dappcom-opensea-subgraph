@@ -1,81 +1,24 @@
-import { ethereum } from '@graphprotocol/graph-ts'
 import {
   OrdersMatched,
-  atomicMatch_,
+  AtomicMatch_Call,
 } from "../generated/WyvernExchange/WyvernExchange"
-import { ExampleEntity } from "../generated/schema"
+import { AtomicMatch } from "../generated/schema"
 
-export function handleOrdersMatched(event: ethereum.event): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
-
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (entity == null) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
-
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
-  }
-
-  // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
-
-  // Entity fields can be set based on event parameters
-  entity.hash = event.params.hash
-  entity.exchange = event.params.exchange
-
-  // Entities can be written to the store with `.save()`
+export function handleOrdersMatched(event: OrdersMatched): void {
+  let entity = new AtomicMatch(event.transaction.hash.toHexString())
+  entity.block = event.block.number.toI32()
+  entity.timestamp = event.block.timestamp.toI32()
+  entity.user = event.transaction.from
+  entity.value = event.params.price
   entity.save()
-
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
-
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
-  // The following functions can then be called on this contract to access
-  // state variables and other data:
-  //
-  // - contract.name(...)
-  // - contract.tokenTransferProxy(...)
-  // - contract.staticCall(...)
-  // - contract.guardedArrayReplace(...)
-  // - contract.minimumTakerProtocolFee(...)
-  // - contract.codename(...)
-  // - contract.testCopyAddress(...)
-  // - contract.testCopy(...)
-  // - contract.calculateCurrentPrice_(...)
-  // - contract.version(...)
-  // - contract.orderCalldataCanMatch(...)
-  // - contract.validateOrder_(...)
-  // - contract.calculateFinalPrice(...)
-  // - contract.protocolFeeRecipient(...)
-  // - contract.hashOrder_(...)
-  // - contract.ordersCanMatch_(...)
-  // - contract.registry(...)
-  // - contract.minimumMakerProtocolFee(...)
-  // - contract.hashToSign_(...)
-  // - contract.cancelledOrFinalized(...)
-  // - contract.owner(...)
-  // - contract.exchangeToken(...)
-  // - contract.validateOrderParameters_(...)
-  // - contract.INVERSE_BASIS_POINT(...)
-  // - contract.calculateMatchPrice_(...)
-  // - contract.approvedOrders(...)
 }
 
-export function handleCreateGravatar(call: atomicMatch_): void {
-  let id = call.transaction.hash.toHex()
-  let transaction = new Transaction(id)
-  transaction.displayName = call.inputs._displayName
-  transaction.imageUrl = call.inputs._imageUrl
-  transaction.save()
+export function handleAtomicMatch(call: AtomicMatch_Call): void {
+  let entity = AtomicMatch.load(call.transaction.hash.toHexString())
+  if (entity == null) {
+    return
+  }
+  call.inputs
+  entity.token = call.inputs.addrs[7].toHexString()
+  entity.save()
 }

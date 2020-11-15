@@ -1,5 +1,5 @@
 specVersion: 0.0.2
-description: Dapp opensea for Ethereum
+description: Dapp opensea 
 repository: https://github.com/Activity00/dappcom-opensea-subgraph
 schema:
   file: ./schema.graphql
