@@ -1,16 +1,11 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+import { ethereum } from '@graphprotocol/graph-ts'
 import {
-  WyvernExchange,
-  OrderApprovedPartOne,
-  OrderApprovedPartTwo,
-  OrderCancelled,
   OrdersMatched,
-  OwnershipRenounced,
-  OwnershipTransferred
+  atomicMatch_,
 } from "../generated/WyvernExchange/WyvernExchange"
 import { ExampleEntity } from "../generated/schema"
 
-export function handleOrderApprovedPartOne(event: OrderApprovedPartOne): void {
+export function handleOrdersMatched(event: ethereum.event): void {
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
   let entity = ExampleEntity.load(event.transaction.from.toHex())
@@ -77,12 +72,10 @@ export function handleOrderApprovedPartOne(event: OrderApprovedPartOne): void {
   // - contract.approvedOrders(...)
 }
 
-export function handleOrderApprovedPartTwo(event: OrderApprovedPartTwo): void {}
-
-export function handleOrderCancelled(event: OrderCancelled): void {}
-
-export function handleOrdersMatched(event: OrdersMatched): void {}
-
-export function handleOwnershipRenounced(event: OwnershipRenounced): void {}
-
-export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
+export function handleCreateGravatar(call: atomicMatch_): void {
+  let id = call.transaction.hash.toHex()
+  let transaction = new Transaction(id)
+  transaction.displayName = call.inputs._displayName
+  transaction.imageUrl = call.inputs._imageUrl
+  transaction.save()
+}
