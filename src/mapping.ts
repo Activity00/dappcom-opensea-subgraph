@@ -18,7 +18,6 @@ export function handleAtomicMatch(call: AtomicMatch_Call): void {
   if (entity == null) {
     return
   }
-  call.inputs
-  entity.token = call.inputs.addrs[7].toHexString()
+  entity.token = call.inputValues[0].value.toAddressArray()[7].toHexString()
   entity.save()
 }
